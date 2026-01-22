@@ -7,8 +7,12 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+
         <Route path="/dashboard/*" element={<DashboardPage />} />
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/admin/*" element={<DashboardPage />} />
+
+        <Route path="/" element={<Navigate to="/admin/home" replace />} />
+        <Route path="*" element={<Navigate to="/admin/home" replace />} />
       </Routes>
     </BrowserRouter>
   );

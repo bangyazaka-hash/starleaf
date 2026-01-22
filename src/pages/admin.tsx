@@ -10,6 +10,7 @@ type Transaction = {
   item: string;
   qty: number;
   price: number;
+  discountPercent: number;
   note?: string;
 };
 
@@ -19,13 +20,14 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const title = useMemo(() => {
-    if (active === "home") return "Home Page";
+    if (active === "home") return "Home";
     if (active === "catalog") return "Catalog";
     return "Cart";
   }, [active]);
 
   return (
     <div className="h-screen bg-white text-gray-800 overflow-hidden">
+      {/* Mobile top bar */}
       <div className="lg:hidden flex items-center justify-between px-4 py-3 border-b">
         <button
           onClick={() => setSidebarOpen(true)}
@@ -39,6 +41,7 @@ export default function App() {
       </div>
 
       <div className="flex h-full">
+        {/* Sidebar */}
         <aside
           className={[
             "w-[280px] border-r bg-white flex flex-col",
@@ -52,8 +55,7 @@ export default function App() {
               <img
                 src="/starleaf.png"
                 alt="StarLeaf Logo"
-                width={200}
-                height={200}
+                className="max-h-[70px] w-auto"
                 draggable={false}
               />
             </div>
@@ -89,27 +91,25 @@ export default function App() {
           <div className="border-t p-4 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 min-w-0">
               <div className="h-10 w-10 rounded-full border flex items-center justify-center text-gray-500">
-                <span className="text-lg">👤</span>
+                👤
               </div>
               <div className="min-w-0">
-                <div className="text-sm text-gray-500 leading-tight">
-                  Operator
-                </div>
+                <div className="text-sm text-gray-600 font-semibold">Admin</div>
+                <div className="text-xs text-gray-400">(bukan super admin)</div>
               </div>
             </div>
 
             <button
               type="button"
               className="text-red-500 hover:text-red-600 font-semibold text-sm inline-flex items-center gap-2"
-              onClick={() =>
-                alert("Apakah anda yakin ingin logout?")
-              }
+              onClick={() => alert("Logout (contoh).")}
             >
               Logout <span className="text-lg leading-none">⎋</span>
             </button>
           </div>
         </aside>
 
+        {/* Backdrop mobile */}
         {sidebarOpen && (
           <button
             type="button"
@@ -119,9 +119,11 @@ export default function App() {
           />
         )}
 
+        {/* Main */}
         <main className="flex-1 h-full overflow-y-auto">
+          {/* Desktop topbar */}
           <div className="hidden lg:flex items-center justify-between px-10 py-6">
-            <div className="text-gray-600 font-semibold">{title}</div>
+            <div className="text-gray-700 font-semibold">{title}</div>
 
             <div className="relative w-[320px]">
               <input
@@ -130,21 +132,24 @@ export default function App() {
                 placeholder="Search"
                 className="w-full rounded-full border px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-teal-300"
               />
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                🔍
+              </div>
             </div>
           </div>
 
           <div className="px-6 lg:px-10 pb-10">
             <div className="h-px bg-gray-100 mb-8" />
 
-            {active === "home" && <HomeKoperasi />}
+            {active === "home" && <HomeKoperasiAdmin />}
 
             {active === "catalog" && (
               <div>
-                <div className="text-gray-600 font-semibold mb-4">Catalog</div>
+                <div className="text-gray-700 font-bold mb-4">Catalog</div>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {Array.from({ length: 12 }).map((_, i) => (
-                    <div key={i} className="border rounded-xl p-4">
-                      <div className="h-24 bg-gray-50 rounded-lg mb-3" />
+                  {Array.from({ length: 9 }).map((_, i) => (
+                    <div key={i} className="border rounded-2xl p-4">
+                      <div className="h-24 bg-gray-50 rounded-xl mb-3" />
                       <div className="font-semibold">Item {i + 1}</div>
                       <div className="text-sm text-gray-500 mt-1">
                         Deskripsi singkat produk.
@@ -160,8 +165,8 @@ export default function App() {
 
             {active === "cart" && (
               <div>
-                <div className="text-gray-600 font-semibold mb-4">Cart</div>
-                <div className="border rounded-xl p-4">
+                <div className="text-gray-700 font-bold mb-4">Cart</div>
+                <div className="border rounded-2xl p-4">
                   <div className="text-sm text-gray-500">
                     Cart masih kosong (contoh).
                   </div>
@@ -189,7 +194,7 @@ function MenuItem({
       <div
         className={[
           "text-center text-base font-medium",
-          active ? "text-teal-400" : "text-gray-600",
+          active ? "text-teal-500" : "text-gray-600",
         ].join(" ")}
       >
         {label}
@@ -197,14 +202,14 @@ function MenuItem({
       <div
         className={[
           "h-px mt-3 w-full",
-          active ? "bg-[#00FFD1]" : "bg-gray-200",
+          active ? "bg-teal-300" : "bg-gray-200",
         ].join(" ")}
       />
     </button>
   );
 }
 
-function HomeKoperasi() {
+function HomeKoperasiAdmin() {
   const [modalOpen, setModalOpen] = useState(false);
 
   const [transactions, setTransactions] = useState<Transaction[]>([
@@ -215,6 +220,7 @@ function HomeKoperasi() {
       item: "Beras 5kg",
       qty: 10,
       price: 68000,
+      discountPercent: 0,
       note: "Restock",
     },
     {
@@ -224,7 +230,8 @@ function HomeKoperasi() {
       item: "Mie Instan",
       qty: 24,
       price: 3500,
-      note: "Penjualan",
+      discountPercent: 10,
+      note: "Promo",
     },
     {
       id: "TX-0003",
@@ -233,19 +240,18 @@ function HomeKoperasi() {
       item: "Gula 1kg",
       qty: 5,
       price: 16000,
+      discountPercent: 0,
       note: "Penjualan",
     },
   ]);
 
   const totalMasuk = transactions
     .filter((t) => t.type === "Masuk")
-    .reduce((acc, t) => acc + t.qty * t.price, 0);
+    .reduce((acc, t) => acc + calcTotal(t.qty, t.price, t.discountPercent), 0);
 
   const totalKeluar = transactions
     .filter((t) => t.type === "Keluar")
-    .reduce((acc, t) => acc + t.qty * t.price, 0);
-
-  const totalTransaksi = transactions.length;
+    .reduce((acc, t) => acc + calcTotal(t.qty, t.price, t.discountPercent), 0);
 
   function addTransaction(tx: Omit<Transaction, "id">) {
     const nextId = `TX-${String(transactions.length + 1).padStart(4, "0")}`;
@@ -260,59 +266,29 @@ function HomeKoperasi() {
             Dashboard Koperasi Barang
           </div>
           <div className="text-sm text-gray-500">
-            Ringkasan transaksi & data (contoh).
+            Admin bisa input transaksi & diskon. Total otomatis dihitung.
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="rounded-full border px-4 py-2 text-sm font-semibold hover:bg-gray-50"
-            onClick={() => alert("Nanti: export laporan (PDF/Excel).")}
-          >
-            Export
-          </button>
-          <button
-            type="button"
-            className="rounded-full bg-[#00FFD1] px-4 py-2 text-sm font-extrabold text-white hover:bg-teal-500"
-            onClick={() => setModalOpen(true)}
-          >
-            + Tambah Transaksi
-          </button>
-        </div>
+        <button
+          type="button"
+          className="rounded-full bg-teal-400 px-4 py-2 text-sm font-extrabold text-white hover:bg-teal-500"
+          onClick={() => setModalOpen(true)}
+        >
+          + Tambah Transaksi
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Total Transaksi"
-          value={`${totalTransaksi}`}
-          note="Semua data (contoh)"
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard title="Total Masuk" value={formatIDR(totalMasuk)} note="Barang masuk" />
-        <StatCard title="Total Keluar" value={formatIDR(totalKeluar)} note="Penjualan/keluar" />
-        <StatCard
-          title="Saldo Perputaran"
-          value={formatIDR(totalKeluar - totalMasuk)}
-          note="Keluar - Masuk"
-        />
+        <StatCard title="Total Keluar" value={formatIDR(totalKeluar)} note="Keluar (setelah diskon)" />
+        <StatCard title="Saldo" value={formatIDR(totalKeluar - totalMasuk)} note="Keluar - Masuk" />
       </div>
 
       <div className="border rounded-2xl p-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="font-bold text-gray-800">Transaksi Terbaru</div>
-            <div className="text-sm text-gray-500">
-              Daftar transaksi terakhir.
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className="text-sm font-semibold text-[#00FFD1] hover:text-teal-700"
-            onClick={() => setModalOpen(true)}
-          >
-            Tambah lagi
-          </button>
+        <div className="font-bold text-gray-800">Transaksi Terbaru</div>
+        <div className="text-sm text-gray-500 mt-1">
+          Total sudah memperhitungkan diskon.
         </div>
 
         <div className="mt-4 overflow-x-auto">
@@ -325,38 +301,35 @@ function HomeKoperasi() {
                 <th className="py-2 pr-3">Barang</th>
                 <th className="py-2 pr-3">Qty</th>
                 <th className="py-2 pr-3">Harga</th>
+                <th className="py-2 pr-3">Diskon</th>
                 <th className="py-2 pr-3">Total</th>
                 <th className="py-2">Catatan</th>
               </tr>
             </thead>
             <tbody>
               {transactions.map((t) => {
-                const total = t.qty * t.price;
+                const total = calcTotal(t.qty, t.price, t.discountPercent);
                 const badge =
                   t.type === "Masuk"
-                    ? "bg-[#00FFD1] text-teal-900"
+                    ? "bg-teal-100 text-teal-700"
                     : "bg-rose-100 text-rose-700";
+
                 return (
                   <tr key={t.id} className="border-b last:border-b-0">
-                    <td className="py-3 pr-3 font-semibold text-gray-800">
-                      {t.id}
-                    </td>
+                    <td className="py-3 pr-3 font-semibold text-gray-800">{t.id}</td>
                     <td className="py-3 pr-3 text-gray-600">{t.date}</td>
                     <td className="py-3 pr-3">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-bold ${badge}`}
-                      >
+                      <span className={`px-2 py-1 rounded-full text-xs font-bold ${badge}`}>
                         {t.type}
                       </span>
                     </td>
                     <td className="py-3 pr-3 text-gray-800">{t.item}</td>
                     <td className="py-3 pr-3 text-gray-600">{t.qty}</td>
+                    <td className="py-3 pr-3 text-gray-600">{formatIDR(t.price)}</td>
                     <td className="py-3 pr-3 text-gray-600">
-                      {formatIDR(t.price)}
+                      {t.discountPercent > 0 ? `${t.discountPercent}%` : "-"}
                     </td>
-                    <td className="py-3 pr-3 font-semibold text-gray-800">
-                      {formatIDR(total)}
-                    </td>
+                    <td className="py-3 pr-3 font-semibold text-gray-800">{formatIDR(total)}</td>
                     <td className="py-3 text-gray-600">{t.note ?? "-"}</td>
                   </tr>
                 );
@@ -378,21 +351,11 @@ function HomeKoperasi() {
   );
 }
 
-function StatCard({
-  title,
-  value,
-  note,
-}: {
-  title: string;
-  value: string;
-  note: string;
-}) {
+function StatCard({ title, value, note }: { title: string; value: string; note: string }) {
   return (
     <div className="border rounded-2xl p-5">
       <div className="text-sm text-gray-500">{title}</div>
-      <div className="mt-1 text-xl sm:text-2xl font-extrabold text-gray-800">
-        {value}
-      </div>
+      <div className="mt-1 text-xl sm:text-2xl font-extrabold text-gray-800">{value}</div>
       <div className="mt-2 text-xs text-gray-500">{note}</div>
     </div>
   );
@@ -414,12 +377,21 @@ function TxModal({
   const [item, setItem] = useState<string>("");
   const [qty, setQty] = useState<string>("1");
   const [price, setPrice] = useState<string>("0");
+  const [discountPercent, setDiscountPercent] = useState<string>("0");
   const [note, setNote] = useState<string>("");
 
   if (!open) return null;
 
-  const qtyNum = Math.max(1, Number(qty || 0));
-  const priceNum = Math.max(0, Number(price || 0));
+  const qtyNum = clampInt(qty, 1, 1_000_000);
+  const priceNum = clampInt(price, 0, 1_000_000_000);
+  const discNum = clampInt(discountPercent, 0, 100);
+
+  // Admin: batasi diskon (contoh 30%). Super admin nanti bisa lebih.
+  const adminMaxDiscount = 30;
+  const discAdmin = Math.min(discNum, adminMaxDiscount);
+
+  const subtotal = qtyNum * priceNum;
+  const total = calcTotal(qtyNum, priceNum, discAdmin);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
@@ -432,11 +404,9 @@ function TxModal({
       <div className="relative w-full max-w-lg rounded-2xl bg-white shadow-xl border p-5">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="text-lg font-bold text-gray-800">
-              Tambah Transaksi
-            </div>
+            <div className="text-lg font-bold text-gray-800">Tambah Transaksi</div>
             <div className="text-sm text-gray-500">
-              Masukkan data transaksi koperasi barang.
+              Diskon admin maksimal {adminMaxDiscount}%.
             </div>
           </div>
           <button
@@ -456,38 +426,31 @@ function TxModal({
             onChange={(v) => setType(v as TxType)}
             options={["Masuk", "Keluar"]}
           />
-          <Input
-            label="Nama Barang"
-            value={item}
-            onChange={setItem}
-            placeholder="Contoh: Beras 5kg"
-          />
+          <Input label="Nama Barang" value={item} onChange={setItem} placeholder="Contoh: Beras 5kg" />
           <Input label="Qty" value={qty} onChange={setQty} type="number" />
-          <Input
-            label="Harga/Item"
-            value={price}
-            onChange={setPrice}
-            type="number"
-          />
-          <Input
-            label="Catatan"
-            value={note}
-            onChange={setNote}
-            placeholder="Opsional"
-          />
+          <Input label="Harga/Item" value={price} onChange={setPrice} type="number" />
+          <Input label="Diskon (%)" value={discountPercent} onChange={setDiscountPercent} type="number" />
+          <Input label="Catatan" value={note} onChange={setNote} placeholder="Opsional" />
         </div>
 
-        <div className="mt-4 flex items-center justify-between">
+        {discNum > adminMaxDiscount ? (
+          <div className="mt-3 text-xs text-amber-700 bg-amber-100 border border-amber-200 rounded-xl px-3 py-2">
+            Diskon kamu {discNum}% melebihi batas admin. Dipakai {adminMaxDiscount}%.
+          </div>
+        ) : null}
+
+        <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="text-sm text-gray-600">
-            Total:{" "}
-            <span className="font-extrabold text-gray-800">
-              {formatIDR(qtyNum * priceNum)}
-            </span>
+            Subtotal: <span className="font-extrabold text-gray-800">{formatIDR(subtotal)}</span>
+            <span className="mx-2 text-gray-400">•</span>
+            Diskon: <span className="font-extrabold text-gray-800">{discAdmin}%</span>
+            <span className="mx-2 text-gray-400">•</span>
+            Total: <span className="font-extrabold text-gray-800">{formatIDR(total)}</span>
           </div>
 
           <button
             type="button"
-            className="rounded-full bg-[#00FFD1] px-5 py-2 text-sm font-extrabold text-white hover:bg-teal-500 disabled:opacity-60"
+            className="rounded-full bg-teal-400 px-5 py-2 text-sm font-extrabold text-white hover:bg-teal-500 disabled:opacity-60"
             disabled={!item.trim()}
             onClick={() =>
               onSubmit({
@@ -496,6 +459,7 @@ function TxModal({
                 item: item.trim(),
                 qty: qtyNum,
                 price: priceNum,
+                discountPercent: discAdmin,
                 note: note.trim() || undefined,
               })
             }
@@ -562,6 +526,19 @@ function Select({
       </select>
     </label>
   );
+}
+
+function calcTotal(qty: number, price: number, discountPercent: number) {
+  const subtotal = qty * price;
+  const disc = Math.max(0, Math.min(100, discountPercent));
+  return Math.round(subtotal * (1 - disc / 100));
+}
+
+function clampInt(v: string, min: number, max: number) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return min;
+  const i = Math.trunc(n);
+  return Math.max(min, Math.min(max, i));
 }
 
 function formatIDR(n: number) {
